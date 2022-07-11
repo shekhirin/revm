@@ -24,6 +24,16 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 sha3 = { version = "0.10", default-features = false }
 tokio = { version = "1.14", features = ["rt-multi-thread", "macros"], optional = true }
 web3 = { version = "0.18", optional = true }
+cxx = "1.0"
+
+[dev-dependencies]
+hex = "0.4"
+
+[build-dependencies]
+bindgen = "0.59.2"
+cc = "1.0"
+
+
 
 [features]
 default = ["std", "secp256k1"]
