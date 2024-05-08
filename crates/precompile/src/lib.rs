@@ -1,6 +1,7 @@
 #![no_std]
 
 mod blake2;
+mod bls12_381;
 mod bn128;
 mod hash;
 mod identity;
@@ -91,7 +92,8 @@ pub enum SpecId {
     BYZANTIUM = 1,
     ISTANBUL = 2,
     BERLIN = 3,
-    LATEST = 4,
+    PRAGUE = 4,
+    LATEST = 5,
 }
 
 impl SpecId {
@@ -107,6 +109,7 @@ impl SpecId {
             BERLIN | LONDON | ARROW_GLACIER | GRAY_GLACIER | MERGE | SHANGHAI | CANCUN => {
                 Self::BERLIN
             }
+            PRAGUE => Self::PRAGUE,
             LATEST => Self::LATEST,
         }
     }
@@ -190,8 +193,29 @@ impl Precompiles {
         })
     }
 
+    pub fn prague() -> &'static Self {
+        static INSTANCE: OnceCell<Precompiles> = OnceCell::new();
+        INSTANCE.get_or_init(|| {
+            let mut precompiles = Self::berlin().clone();
+            precompiles.fun.extend(vec![
+                // EIP-2537: Precompile for BLS12-381 curve operations
+                // TODO(alexey): add BLS12-381 precompiles
+                // bls12_381::G1ADD,
+                // bls12_381::G1MUL,
+                // bls12_381::G1MSM,
+                // bls12_381::G2ADD,
+                // bls12_381::G2MUL,
+                // bls12_381::G2MSM,
+                // bls12_381::PAIRING,
+                // bls12_381::MAP_FP_TO_G1,
+                // bls12_381::MAP_FP2_TO_G2,
+            ]);
+            precompiles
+        })
+    }
+
     pub fn latest() -> &'static Self {
-        Self::berlin()
+        Self::prague()
     }
 
     pub fn new(spec: SpecId) -> &'static Self {
@@ -200,6 +224,7 @@ impl Precompiles {
             SpecId::BYZANTIUM => Self::byzantium(),
             SpecId::ISTANBUL => Self::istanbul(),
             SpecId::BERLIN => Self::berlin(),
+            SpecId::PRAGUE => Self::prague(),
             SpecId::LATEST => Self::latest(),
         }
     }
